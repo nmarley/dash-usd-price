@@ -16,3 +16,8 @@ Bitcoin weighted average here -- use this to determine BTC/USD price
 
 * https://api.bitcoinaverage.com/ticker/global/USD/
 
+### Note
+
+This isn't structured well, the namespace is polluted -- it's quick & dirty, intentionally.
+
+
