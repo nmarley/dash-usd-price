@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masternode Processing Status</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <div>
+    Bitstamp BTC/USD Price: <%= btc_usd %><br>
+    latest update: <%= bits_ts %>
+  </div>
+
+  <hr>
+
+  <div>
+    Poloniex Dash/BTC Price: <%= dash_btc %><br>
+    latest update: <%= polo_ts %>
+  </div>
+
+  <hr>
+  
+  <div>
+    $<%= btc_usd %> * <%= dash_btc %> = $<%= dash_usd %> USD / Dash<br>
+    <small>Page last generated: <%= last_page_gen %></small>
+  </div>
+</body>
+</html>
