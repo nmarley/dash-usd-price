@@ -6,6 +6,7 @@ require 'wavg/db'
 
 polo = get_latest_poloniex
 bits = get_latest_bitstamp
+btc_ltc = get_latest_polo_btc_ltc.last.to_f.round(8)
 
 btc_usd = bits.last.to_f.round(8)
 bits_ts = bits.ts
