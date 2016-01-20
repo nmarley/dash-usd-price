@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html id="htmlTop" lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Masternode Processing Status</title>
+  <title data-bind="text: page_title"></title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -79,6 +79,10 @@ function BitstampViewModel() {
     return (self.price() * self.polo_btc_dash()).toFixed(2);
   })
 
+  self.page_title = ko.computed(function() {
+    return self.dash_usd() + " = Dash/USD Rate";
+  })
+
   self.formattedPrice = ko.computed(function() {
       return self.price().toFixed(2);
   });
@@ -112,7 +116,7 @@ $(document).ready(function() {
     fetchDashLast();
   }, 5000)
 
-  ko.applyBindings(viewModel);
+  ko.applyBindings(viewModel, document.getElementById('htmlTop'));
 });
 var viewModel = new BitstampViewModel();
 </script>
