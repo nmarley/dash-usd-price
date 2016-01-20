@@ -14,7 +14,7 @@ bits_ts = bits.ts
 dash_btc = polo.last.to_f.round(8)
 polo_ts = polo.created_at
 
-dash_usd = (polo.last * bits.last).to_f.round(4)
+dash_usd = sprintf("%.2f", (polo.last * bits.last).to_f.round(4))
 last_page_gen = Time.now.getutc
 
 path = 'dash-price.html.erb'
