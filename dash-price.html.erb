@@ -16,23 +16,26 @@
   <hr>
 
   <div>
-    Poloniex BTC/Dash Price: <%= dash_btc %><br>
-    latest update: <%= polo_ts %>
+    Poloniex BTC/Dash Price: <span id="polo_btc_dash" data-bind="text: polo_btc_dash"><%= dash_btc %></span><br>
+    latest update: <span id="polo_ts" data-bind="text: polo_btc_dash_ts"><%= polo_ts %></span>
   </div>
 
   <hr>
 
   <div>
-    $<%= btc_usd %> * <%= dash_btc %> = $<%= dash_usd %> USD / Dash<br>
-    <small>Page last generated: <%= last_page_gen %></small>
+    $<span data-bind="text: formattedPrice"><%= btc_usd %></span> * <span data-bind="text: polo_btc_dash"><%= dash_btc %></span> = $<span data-bind="text: dash_usd"><%= dash_usd %></span> USD / Dash<br>
+    <small>Value last updated: <span id="lastDashUSDUpdate" data-bind="text: lastDashUSDUpdate"><%= last_page_gen %></span></small>
   </div>
 
+<!-- LTC price... who cares? -->
+<!--
   <hr>
 
   <div>
     Poloniex BTC/LTC Price: <%= btc_ltc %><br>
     latest update: <%= polo_ts %>
   </div>
+  -->
 
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
@@ -40,22 +43,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js" type="text/javascript"></script>
 <script src="http://js.pusher.com/2.2/pusher.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-function init() {
-  // var exampleSocket = new WebSocket("wss://api.poloniex.com", "ticker");
-  // exampleSocket.onMessage = function (event) {
-  //   console.log(event.data);
-  // }
-
-  var pusher = new Pusher('de504dc5763aeef9ff52');
-  var channel = pusher.subscribe('live_trades');
-  channel.bind('trade', function(data) {
-    window.console.log('id:' + data.id + ' price: ' + data.price + ' amount: ' + data.amount);
-    update_bitstamp(data.price);
-  });
-
-  return;
-}
-
 var getNow = function () {
   var formattedDate = moment().utc().format('YYYY-MM-DD HH:mm:ss UTC');
   return formattedDate;
@@ -64,24 +51,46 @@ var getNow = function () {
 function BitstampViewModel() {
   var self = this;
 
-  // set initial price here, or just leave as-was...
-  //self.price = ko.observable(0);
   var current_val = parseFloat(jQuery('#btc_usd_price').text());
   var current_bits_ts = jQuery('#bits_ts').text();
+  var current_polo_btc_dash = jQuery('#polo_btc_dash').text();
+  var current_polo_ts = jQuery('#polo_ts').text();
+  var last_update = jQuery('#lastDashUSDUpdate').text();
 
   self.price = ko.observable(current_val);
-  self.bitsTs = ko.observable(getNow());
+  self.bitsTs = ko.observable(current_bits_ts);
+  self.polo_btc_dash = ko.observable(current_polo_btc_dash);
+  self.polo_btc_dash_ts = ko.observable(current_polo_ts);
+  self.lastDashUSDUpdate = ko.observable(last_update);
 
   self.newPrice = function(price) {
     self.price(price);
     self.bitsTs(getNow());
+    self.lastDashUSDUpdate(getNow());
   };
+
+  self.newPolo = function(polo_btc_dash) {
+    self.polo_btc_dash(polo_btc_dash);
+    self.polo_btc_dash_ts(getNow());
+    self.lastDashUSDUpdate(getNow());
+  }
+
+  self.dash_usd = ko.computed(function() {
+    return (self.price() * self.polo_btc_dash()).toFixed(2);
+  })
 
   self.formattedPrice = ko.computed(function() {
       return self.price().toFixed(2);
   });
+}
 
-  // can use $.getJSON to grab 1st value... or pull from DB to initialize it.
+var fetchDashLast = function() {
+  $.getJSON('https://poloniex.com/public?command=returnTicker', function(data) {
+    fetch_time = getNow();
+    var dashLast = data.BTC_DASH.last;
+    viewModel.newPolo(dashLast);
+    console.log("Poloniex: Dash last = " + dashLast);
+  })
 }
 
 $(document).ready(function() {
@@ -91,6 +100,17 @@ $(document).ready(function() {
     window.console.log('Bitstamp: ' + 'id:' + data.id + ' price: ' + data.price + ' amount: ' + data.amount);
     viewModel.newPrice(data.price);
   });
+
+  // poloniex websocket API broken as of 2016-01-20
+  // var exampleSocket = new WebSocket("wss://api.poloniex.com", "ticker");
+  // exampleSocket.onMessage = function (event) {
+  //   console.log(event.data);
+  // }
+
+  // since poloniex websocket is broken, poll JSON api every 5 seconds
+  window.setInterval(function () {
+    fetchDashLast();
+  }, 5000)
 
   ko.applyBindings(viewModel);
 });
