@@ -42,6 +42,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js" type="text/javascript"></script>
 <script src="http://js.pusher.com/2.2/pusher.min.js" type="text/javascript"></script>
+<script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz" type="text/javascript"></script>
+
 <script type="text/javascript">
 var getNow = function () {
   var formattedDate = moment().utc().format('YYYY-MM-DD HH:mm:ss UTC');
@@ -88,37 +90,36 @@ function BitstampViewModel() {
   });
 }
 
-var fetchDashLast = function() {
-  $.getJSON('https://poloniex.com/public?command=returnTicker', function(data) {
-    fetch_time = getNow();
-    var dashLast = data.BTC_DASH.last;
-    viewModel.newPolo(dashLast);
-    console.log("Poloniex: Dash last = " + dashLast);
-  })
-}
-
 $(document).ready(function() {
   var pusher = new Pusher('de504dc5763aeef9ff52');
   var channel = pusher.subscribe('live_trades');
   channel.bind('trade', function(data) {
-    window.console.log('Bitstamp: ' + 'id:' + data.id + ' price: ' + data.price + ' amount: ' + data.amount);
+    console.log('Bitstamp: ' + 'id:' + data.id + ' price: ' + data.price + ' amount: ' + data.amount);
     viewModel.newPrice(data.price);
   });
 
-  // poloniex websocket API broken as of 2016-01-20
-  // var exampleSocket = new WebSocket("wss://api.poloniex.com", "ticker");
-  // exampleSocket.onMessage = function (event) {
-  //   console.log(event.data);
-  // }
-
-  // since poloniex websocket is broken, poll JSON api every 5 seconds
-  window.setInterval(function () {
-    fetchDashLast();
-  }, 5000)
+  var poloniex_ticker_labels = ["currencyPair", "last", "lowestAsk", "highestBid", "percentChange", "baseVolume", "quoteVolume", "isFrozen", "24hrHigh", "24hrLow"];
+  poloniex_conn.onopen = function (session) {
+    function tickerEvent (args, kwargs) {
+      var h = poloniex_ticker_labels.reduce(function(prev, curr, index, arr) {
+        prev[arr[index]] = args[index];
+        return prev;
+      }, {});
+      if (h.currencyPair === "BTC_DASH") {
+        console.log("Poloniex: BTC_DASH = " + h.last);
+        viewModel.newPolo(h.last);
+      }
+    }
+    session.subscribe('ticker', tickerEvent);
+  }
 
   ko.applyBindings(viewModel, document.getElementById('htmlTop'));
 });
 var viewModel = new BitstampViewModel();
+var poloniex_conn = new autobahn.Connection({
+  url: "wss://api.poloniex.com",
+  realm: "realm1"
+});
+poloniex_conn.open();
 </script>
-
 </html>
