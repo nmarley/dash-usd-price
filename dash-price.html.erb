@@ -66,15 +66,19 @@ function BitstampViewModel() {
   self.lastDashUSDUpdate = ko.observable(last_update);
 
   self.newPrice = function(price) {
+    var now = getNow();
+
     self.price(price);
-    self.bitsTs(getNow());
-    self.lastDashUSDUpdate(getNow());
+    self.bitsTs(now);
+    self.lastDashUSDUpdate(now);
   };
 
   self.newPolo = function(polo_btc_dash) {
+    var now = getNow();
+
     self.polo_btc_dash(polo_btc_dash);
-    self.polo_btc_dash_ts(getNow());
-    self.lastDashUSDUpdate(getNow());
+    self.polo_btc_dash_ts(now);
+    self.lastDashUSDUpdate(now);
   }
 
   self.dash_usd = ko.computed(function() {
