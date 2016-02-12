@@ -150,18 +150,17 @@ $(document).ready(function() {
         return prev;
       }, {});
 
-      // TODO: use a switch here
-      if (h.currencyPair === "BTC_DASH") {
-        console.log("Poloniex: BTC_DASH = " + h.last);
-        viewModel.newPolo(h.last);
-      }
-      if (h.currencyPair === "BTC_LTC") {
-        console.log("Poloniex: BTC_LTC = " + h.last);
-        viewModel.newPoloBtcLtc(h.last);
-      }
-      if (h.currencyPair === "BTC_ETH") {
-        console.log("Poloniex: BTC_ETH = " + h.last);
-        viewModel.newPoloBtcEth(h.last);
+      console.log("Poloniex: " + h.currencyPair + " = " + h.last);
+      switch (h.currencyPair) {
+        case "BTC_DASH":
+          viewModel.newPolo(h.last);
+          break;
+        case "BTC_LTC":
+          viewModel.newPoloBtcLtc(h.last);
+          break;
+        case "BTC_ETH":
+          viewModel.newPoloBtcEth(h.last);
+          break;
       }
     }
     session.subscribe('ticker', tickerEvent);
