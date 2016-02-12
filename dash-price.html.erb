@@ -111,6 +111,14 @@ function BitstampViewModel() {
     return;
   }
 
+  self.newPoloBtcEth = function(price) {
+    var now = getNow();
+    // TODO: bind/apply here to refactor this and eth, dash, etc
+    self.polo_btc_eth(price);
+    self.polo_btc_eth_ts(now);
+    return;
+  }
+
   self.dash_usd = ko.computed(function() {
     return (self.price() * self.polo_btc_dash()).toFixed(2);
   })
@@ -149,11 +157,11 @@ $(document).ready(function() {
       }
       if (h.currencyPair === "BTC_LTC") {
         console.log("Poloniex: BTC_LTC = " + h.last);
-        viewModel.newPolo(h.last);
+        viewModel.newPoloBtcLtc(h.last);
       }
       if (h.currencyPair === "BTC_ETH") {
-        console.log("Poloniex: BTC_DASH = " + h.last);
-        viewModel.newPolo(h.last);
+        console.log("Poloniex: BTC_ETH = " + h.last);
+        viewModel.newPoloBtcEth(h.last);
       }
     }
     session.subscribe('ticker', tickerEvent);
