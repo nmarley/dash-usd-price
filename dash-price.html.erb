@@ -78,6 +78,14 @@ function BitstampViewModel() {
   self.polo_btc_dash_ts = ko.observable('0000-00-00 00:00:00');
   self.lastDashUSDUpdate = ko.observable('0000-00-00 00:00:00');
 
+  // LTC
+  self.polo_btc_ltc = ko.observable(0.0);
+  self.polo_btc_ltc_ts = ko.observable('0000-00-00 00:00:00');
+
+  // ETH
+  self.polo_btc_eth = ko.observable(0.0);
+  self.polo_btc_eth_ts = ko.observable('0000-00-00 00:00:00');
+
   self.newPrice = function(price) {
     var now = getNow();
 
